@@ -84,10 +84,24 @@ def luther_loss(
 
 
 def luther_mapping_loss(Q: torch.Tensor, M: torch.Tensor, V: torch.Tensor, *, normalize: bool = False) -> torch.Tensor:
-    """Luther loss (mapping form): ||Q M − V||_F.
+    """Luther loss (mapping form): ``||Q M − V||_F``.
 
-    Equivalent to the provided ``compute_luther_loss`` definition．When
-    ``normalize=True``, divide by ``||V||_F`` to make the value scale-invariant．
+    Measures the fitting error when a linear mapping ``M`` transforms a basis
+    ``Q`` into the target responses ``V``.
+
+    Definitions
+    ----------
+    - ``Q ∈ R^{N×k}``: Design/basis matrix (e.g., sensor basis) sampled over ``N``
+      wavelengths or samples.
+    - ``M ∈ R^{k×m}``: Linear mapping from the basis to ``m`` target channels.
+    - ``V ∈ R^{N×m}``: Target responses to match (e.g., desired CMF-projected
+      responses or RGB responses).
+
+    Notes
+    -----
+    - ``normalize=True`` divides by ``||V||_F`` to make the value scale-invariant.
+    - With the optimal ``M* = pinv(Q) V``, the loss equals ``||(I − P_Q) V||_F``
+      where ``P_Q = Q pinv(Q)`` (projection onto ``span(Q)``).
     """
     if Q.ndim != 2 or M.ndim != 2 or V.ndim != 2:
         raise ValueError("Q, M, and V must be 2D tensors")
