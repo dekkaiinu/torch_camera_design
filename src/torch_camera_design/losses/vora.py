@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-__all__ = ["vora_value", "vora_loss"]
+__all__ = ["vora_value", "vora_loss", "vora_value_general"]
 
 
 def _orthonormal_basis(x: torch.Tensor) -> torch.Tensor:
@@ -47,6 +47,25 @@ def vora_value(sensors: torch.Tensor, cmfs: torch.Tensor) -> torch.Tensor:
     # trace(Ps Pc) equals sum of squared cosines of principal angles
     val = torch.trace(p_s @ p_c) / float(m)
     # Clamp to [0, 1] for numerical safety
+    return torch.clamp(val, 0.0, 1.0)
+
+
+def vora_value_general(Q: torch.Tensor, X: torch.Tensor) -> torch.Tensor:
+    """一般射影版 Vora-Value．
+
+    提示クラスの ``compute_vora_value`` 相当の定義（P= X (X^T X)^{-1} X^T）を
+    双方に適用して Vora-Value を計算する．
+    """
+    if Q.ndim != 2 or X.ndim != 2:
+        raise ValueError("Q, X は 2D Tensor である必要があります")
+    if Q.size(0) != X.size(0):
+        raise ValueError("Q と X は同じサンプル数（第1次元）である必要があります")
+    XtX_inv = torch.linalg.inv(X.T @ X + 1e-6 * torch.eye(X.size(1), device=X.device, dtype=X.dtype))
+    PtX = X @ XtX_inv @ X.T
+    QtQ_inv = torch.linalg.inv(Q.T @ Q + 1e-6 * torch.eye(Q.size(1), device=Q.device, dtype=Q.dtype))
+    PtQ = Q @ QtQ_inv @ Q.T
+    m = min(X.size(1), Q.size(1))
+    val = torch.trace(PtQ @ PtX) / float(m)
     return torch.clamp(val, 0.0, 1.0)
 
 

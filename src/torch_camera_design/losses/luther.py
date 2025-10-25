@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import torch
 
-__all__ = ["luther_loss", "estimate_luther_mapping"]
+__all__ = [
+    "luther_loss",
+    "estimate_luther_mapping",
+    "luther_mapping_loss",
+    "luther_regression_loss",
+]
 
 
 def _projection_matrix(basis: torch.Tensor) -> torch.Tensor:
@@ -76,5 +81,38 @@ def luther_loss(
     denom = torch.linalg.norm(sensors, ord="fro")
     # Avoid division by zero for degenerate input
     return num / (denom + torch.finfo(sensors.dtype).eps)
+
+
+def luther_mapping_loss(Q: torch.Tensor, M: torch.Tensor, V: torch.Tensor, *, normalize: bool = False) -> torch.Tensor:
+    """Luther loss (mapping 版): ||Q M − V||_F．
+
+    提示コードの ``compute_luther_loss`` と同等の定義．``normalize=True`` のとき
+    は ``||V||_F`` で割ってスケール不変にする．
+    """
+    if Q.ndim != 2 or M.ndim != 2 or V.ndim != 2:
+        raise ValueError("Q, M, V は 2D Tensor である必要があります")
+    if Q.size(1) != M.size(0):
+        raise ValueError("Q @ M が定義できません（次元不一致）")
+    if Q.size(0) != V.size(0) or M.size(1) != V.size(1):
+        raise ValueError("QM と V の形状が一致しません")
+    diff = Q @ M - V
+    num = torch.linalg.norm(diff, ord="fro")
+    if not normalize:
+        return num
+    denom = torch.linalg.norm(V, ord="fro")
+    return num / (denom + torch.finfo(V.dtype).eps)
+
+
+def luther_regression_loss(Q: torch.Tensor, X: torch.Tensor, *, normalize: bool = False) -> torch.Tensor:
+    """回帰版 Luther: M=pinv(Q)X による最小二乗誤差 ||Q M − X||_F．
+
+    これは ``(P_Q − I)X`` の Frobenius ノルムと等価（``P_Q=Q pinv(Q)``）．
+    """
+    if Q.ndim != 2 or X.ndim != 2:
+        raise ValueError("Q, X は 2D Tensor である必要があります")
+    if Q.size(0) != X.size(0):
+        raise ValueError("Q と X は同じサンプル数（第1次元）である必要があります")
+    M_hat = torch.linalg.pinv(Q) @ X
+    return luther_mapping_loss(Q, M_hat, X, normalize=normalize)
 
 
