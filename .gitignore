@@ -28,6 +28,7 @@ htmlcov/
 venv/
 ENV/
 env/
+poetry.lock
 
 # IDEs
 .idea/
