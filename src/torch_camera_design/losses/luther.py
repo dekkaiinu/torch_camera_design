@@ -21,8 +21,6 @@ def _projection_matrix(basis: torch.Tensor) -> torch.Tensor:
     return basis @ pseudo_inverse
 
 
-# NOTE: The explicit mapping estimator was removed to keep the public API minimal.
-
 
 def luther_loss(
     sensors: torch.Tensor,
