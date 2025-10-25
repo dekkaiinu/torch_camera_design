@@ -1,0 +1,29 @@
+# Cursor Rules for torch_camera_design
+
+## Environment
+- Use Python 3.10 via pyenv (`.python-version`).
+- Use Poetry for dependency management and virtualenvs (`poetry install`).
+
+## Code & API
+- Docstrings must be in English.
+- Keep package `__init__.py` files light; avoid heavy imports.
+- Prefer explicit type hints for public functions and classes.
+- Avoid deep nesting; prefer early returns.
+- Use descriptive names; avoid abbreviations and 1–2 char identifiers.
+
+## Layout
+- `src/torch_camera_design/` contains library code.
+- `losses/` includes `luther.py`, `vora.py`, `l2.py`.
+- `evaluation/` includes metrics/report modules.
+
+## Testing
+- Use pytest. Place tests under `tests/`.
+- Cover shapes/dtypes/devices edge cases for tensor operations.
+
+## Commit style
+- Format: `type(scope): message`, e.g. `feat(losses): add vora loss`.
+
+## Cursor behavior
+- When proposing edits, show only the minimal necessary diff.
+- Do not reformat unrelated code.
+- Prefer adding small, focused functions over large multi-responsibility ones.
