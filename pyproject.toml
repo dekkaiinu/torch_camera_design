@@ -1,49 +1,25 @@
 [build-system]
-requires = ["hatchling>=1.25"]
-build-backend = "hatchling.build"
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "torch_camera_design"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-requires-python = ">=3.9"
-license = { text = "MIT" }
-authors = [
-  { name = "", email = "" },
-]
-keywords = []
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3 :: Only",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-]
-dependencies = [
+license = "MIT"
+authors = [" "]
+packages = [
+  { include = "torch_camera_design", from = "src" }
 ]
 
-[project.optional-dependencies]
-dev = [
-  "pytest>=7",
-]
+[tool.poetry.dependencies]
+python = "^3.10"
 
-[project.urls]
-Homepage = ""
-Repository = ""
-Issues = ""
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = "-ra"
 testpaths = ["tests"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/torch_camera_design"]
-
-[tool.hatch.build.targets.sdist]
-include = [
-  "/src/torch_camera_design",
-  "/tests",
-  "/README.md",
-  "/pyproject.toml",
-]

@@ -4,13 +4,22 @@
 
 ## 開発
 
-- 依存関係のインストール:
+- Python バージョン（pyenv）:
   ```bash
-  pip install -e .[dev]
+  pyenv install 3.10.14   # 未インストールなら
+  pyenv local 3.10.14     # このプロジェクトに固定
   ```
+
+- 依存関係のインストール（Poetry）:
+  ```bash
+  curl -sSL https://install.python-poetry.org | python -
+  poetry env use 3.10
+  poetry install
+  ```
+
 - テスト実行:
   ```bash
-  pytest -q
+  poetry run pytest -q
   ```
 
 ## ライセンス
