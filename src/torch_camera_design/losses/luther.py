@@ -4,7 +4,6 @@ import torch
 
 __all__ = [
     "luther_loss",
-    "estimate_luther_mapping",
     "luther_mapping_loss",
     "luther_regression_loss",
 ]
@@ -22,22 +21,7 @@ def _projection_matrix(basis: torch.Tensor) -> torch.Tensor:
     return basis @ pseudo_inverse
 
 
-def estimate_luther_mapping(cmfs: torch.Tensor, sensors: torch.Tensor) -> torch.Tensor:
-    """Least-squares mapping ``A`` s.t. ``cmfs @ A ≈ sensors``.
-
-    Parameters
-    ----------
-    cmfs : torch.Tensor, shape (n, 3)
-        Color matching functions sampled at ``n`` wavelengths.
-    sensors : torch.Tensor, shape (n, m)
-        Sensor sensitivities (``m`` channels, often 3).
-
-    Returns
-    -------
-    torch.Tensor, shape (3, m)
-        The minimizing linear map ``A``.
-    """
-    return torch.linalg.pinv(cmfs) @ sensors
+# NOTE: The explicit mapping estimator was removed to keep the public API minimal.
 
 
 def luther_loss(
