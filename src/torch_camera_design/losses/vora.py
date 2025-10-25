@@ -8,8 +8,15 @@ __all__ = ["vora_value", "vora_loss", "vora_value_general"]
 def _orthonormal_basis(x: torch.Tensor) -> torch.Tensor:
     """Return an orthonormal basis spanning ``col(x)`` using QR decomposition.
 
-    ``x``: shape (n, k)
-    Returns: ``Q`` with shape (n, r), r = rank(x)
+    Parameters
+    ----------
+    x : torch.Tensor, shape (n, k)
+        Input matrix whose column space defines the subspace.
+
+    Returns
+    -------
+    torch.Tensor, shape (n, r)
+        Orthonormal basis with ``r = rank(x)``.
     """
     if x.numel() == 0:
         raise ValueError("input is empty")
@@ -51,10 +58,10 @@ def vora_value(sensors: torch.Tensor, cmfs: torch.Tensor) -> torch.Tensor:
 
 
 def vora_value_general(Q: torch.Tensor, X: torch.Tensor) -> torch.Tensor:
-    """一般射影版 Vora-Value．
+    """General (non-orthonormal) projector Vora-Value.
 
-    提示クラスの ``compute_vora_value`` 相当の定義（P= X (X^T X)^{-1} X^T）を
-    双方に適用して Vora-Value を計算する．
+    Matches the provided class's definition using ``P = X (X^T X)^{-1} X^T``
+    for both subspaces.
     """
     if Q.ndim != 2 or X.ndim != 2:
         raise ValueError("Q, X は 2D Tensor である必要があります")

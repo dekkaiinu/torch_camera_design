@@ -84,17 +84,17 @@ def luther_loss(
 
 
 def luther_mapping_loss(Q: torch.Tensor, M: torch.Tensor, V: torch.Tensor, *, normalize: bool = False) -> torch.Tensor:
-    """Luther loss (mapping 版): ||Q M − V||_F．
+    """Luther loss (mapping form): ||Q M − V||_F.
 
-    提示コードの ``compute_luther_loss`` と同等の定義．``normalize=True`` のとき
-    は ``||V||_F`` で割ってスケール不変にする．
+    Equivalent to the provided ``compute_luther_loss`` definition．When
+    ``normalize=True``, divide by ``||V||_F`` to make the value scale-invariant．
     """
     if Q.ndim != 2 or M.ndim != 2 or V.ndim != 2:
-        raise ValueError("Q, M, V は 2D Tensor である必要があります")
+        raise ValueError("Q, M, and V must be 2D tensors")
     if Q.size(1) != M.size(0):
-        raise ValueError("Q @ M が定義できません（次元不一致）")
+        raise ValueError("Q @ M is not defined due to mismatched dimensions")
     if Q.size(0) != V.size(0) or M.size(1) != V.size(1):
-        raise ValueError("QM と V の形状が一致しません")
+        raise ValueError("Shapes of QM and V do not match")
     diff = Q @ M - V
     num = torch.linalg.norm(diff, ord="fro")
     if not normalize:
@@ -104,14 +104,14 @@ def luther_mapping_loss(Q: torch.Tensor, M: torch.Tensor, V: torch.Tensor, *, no
 
 
 def luther_regression_loss(Q: torch.Tensor, X: torch.Tensor, *, normalize: bool = False) -> torch.Tensor:
-    """回帰版 Luther: M=pinv(Q)X による最小二乗誤差 ||Q M − X||_F．
+    """Regression form of Luther: least-squares error with M=pinv(Q)X, i.e., ||Q M − X||_F.
 
-    これは ``(P_Q − I)X`` の Frobenius ノルムと等価（``P_Q=Q pinv(Q)``）．
+    This equals the Frobenius norm of ``(P_Q − I)X`` where ``P_Q = Q pinv(Q)``．
     """
     if Q.ndim != 2 or X.ndim != 2:
-        raise ValueError("Q, X は 2D Tensor である必要があります")
+        raise ValueError("Q and X must be 2D tensors")
     if Q.size(0) != X.size(0):
-        raise ValueError("Q と X は同じサンプル数（第1次元）である必要があります")
+        raise ValueError("Q and X must share the first dimension (sample count)")
     M_hat = torch.linalg.pinv(Q) @ X
     return luther_mapping_loss(Q, M_hat, X, normalize=normalize)
 
